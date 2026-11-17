@@ -17,7 +17,7 @@ Landing page en PHP (sin base de datos ni librerías externas). Funciona en cual
 
 ## Publicación automática
 
-Cada vez que se hace merge de un cambio en la rama `main`, GitHub sube sola la web al hosting por FTP. Solo envía los archivos que han cambiado, así que tarda poco. Antes de subir nada comprueba que los archivos PHP no tienen errores; si los tiene, no publica y la web sigue como estaba.
+Cada vez que se hace merge de un cambio en la rama `main`, GitHub sube sola la web al hosting por FTP normal (sin cifrar). Si el hosting admite FTPS, conviene activarlo con el secret `FTP_PROTOCOL` (ver la tabla del paso 2): así la contraseña viaja cifrada. Solo envía los archivos que han cambiado, así que tarda poco. Antes de subir nada comprueba que los archivos PHP no tienen errores; si los tiene, no publica y la web sigue como estaba.
 
 No se suben al servidor: este `LEEME.md` y cualquier otro `.md`, la carpeta `.github`, los archivos de Git (`.gitignore`…) ni un posible `CV-original`.
 
@@ -32,7 +32,7 @@ Al contratar el hosting te llegará un correo de bienvenida, o los verás en su 
 - **Contraseña FTP**. Si no la sabes, crea una cuenta FTP nueva desde el panel y apunta la contraseña.
 - **Carpeta de la web**: la carpeta pública donde va la web, normalmente `public_html/` o `www/`. Si al entrar por FTP ya estás dentro de esa carpeta, no hace falta este dato.
 
-Si dudas, escribe al soporte del hosting: «¿Qué servidor, usuario y carpeta tengo que usar para subir la web por FTP? ¿Admitís FTPS (FTP con TLS)?».
+Si dudas, escribe al soporte del hosting: «¿Qué servidor, usuario y carpeta tengo que usar para subir la web por FTP?».
 
 ### Paso 2. Guárdalos en GitHub como «secrets»
 
@@ -51,7 +51,7 @@ Los secrets son datos privados que GitHub guarda cifrados: nadie los puede ver, 
 | `FTP_USERNAME` | El usuario FTP | Sí |
 | `FTP_PASSWORD` | La contraseña FTP | Sí |
 | `FTP_SERVER_DIR` | La carpeta de la web **terminada en barra**, p. ej. `public_html/` | Solo si al entrar por FTP no estás ya dentro de la carpeta pública |
-| `FTP_PROTOCOL` | `ftps` (por defecto, conexión cifrada), `ftps-legacy` o `ftp` | No. Ver «Si falla» |
+| `FTP_PROTOCOL` | `ftp` (por defecto), o `ftps` / `ftps-legacy` si el hosting admite conexión cifrada | No |
 | `FTP_PORT` | El puerto, si el hosting indica uno distinto de 21 | No |
 
 Si te equivocas en un valor, vuelve a esa pantalla, pulsa el lápiz junto al secret y pégalo de nuevo (GitHub no deja ver el valor guardado, solo reemplazarlo).
@@ -70,7 +70,8 @@ A partir de ahí no hay que hacer nada: cada merge en `main` publica solo.
 Si sale una cruz roja, pulsa sobre ella y luego en **Subir al hosting** para ver el error.
 
 - **Error de inicio de sesión (`530`, `Login incorrect`)**: revisa `FTP_USERNAME` y `FTP_PASSWORD`. Algunos hostings piden el usuario completo, tipo `usuario@javierfuente.es`.
-- **Error de conexión o de TLS/certificado (`ECONNREFUSED`, `timeout`, `certificate`)**: puede que el hosting no admita FTPS en el puerto 21. Prueba primero creando `FTP_PROTOCOL` con el valor `ftps-legacy` y `FTP_PORT` con `990`. Si tampoco, pon `FTP_PROTOCOL` = `ftp` y borra `FTP_PORT`. El FTP normal funciona, pero envía la contraseña sin cifrar: úsalo solo si el hosting no ofrece otra opción.
+- **Error de conexión (`ECONNREFUSED`, `timeout`)**: revisa `FTP_SERVER` y pregunta al hosting si el FTP usa un puerto distinto de 21; si es así, créalo en `FTP_PORT`.
+- **El hosting solo admite conexión cifrada (`530 TLS required`, `SSL/TLS required`)**: crea `FTP_PROTOCOL` con el valor `ftps`. Si aun así falla, prueba `ftps-legacy` con `FTP_PORT` = `990`.
 - **La web sale vacía o dentro de otra carpeta**: revisa `FTP_SERVER_DIR` (debe terminar en `/`).
 - **Errores de PHP**: el paso «Comprobar que no hay errores de PHP» indica el archivo y la línea. Corrígelo y vuelve a hacer merge.
 

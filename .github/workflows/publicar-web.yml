@@ -56,7 +56,8 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           # Opcionales: si no se rellenan se usan estos valores por defecto.
-          protocol: ${{ secrets.FTP_PROTOCOL || 'ftps' }}
+          # Va por FTP normal; para cifrar la conexión crea el secret FTP_PROTOCOL = ftps.
+          protocol: ${{ secrets.FTP_PROTOCOL || 'ftp' }}
           port: ${{ secrets.FTP_PORT || '21' }}
           server-dir: ${{ secrets.FTP_SERVER_DIR || './' }}
           # Solo sube lo que ha cambiado desde la última vez (guarda un registro
