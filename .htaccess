@@ -35,3 +35,8 @@ RedirectMatch 403 ^/includes/
 # RewriteEngine On
 # RewriteCond %{HTTPS} off
 # RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Registro interno de la publicación automática (no debe verse desde fuera)
+<Files ".ftp-deploy-sync-state.json">
+    Require all denied
+</Files>

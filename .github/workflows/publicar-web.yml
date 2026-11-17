@@ -1,0 +1,72 @@
+# Publica la web en el hosting por FTP cada vez que se actualiza la rama main
+# (al hacer merge de un pull request). También se puede lanzar a mano desde
+# la pestaña «Actions» > «Publicar la web» > «Run workflow».
+#
+# Los datos del hosting se guardan como secrets del repositorio (nunca en el código).
+# Las instrucciones paso a paso están en LEEME.md, apartado «Publicación automática».
+
+name: Publicar la web
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Si se hacen dos merges seguidos, la segunda subida espera a que termine la primera.
+concurrency:
+  group: publicar-web
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  publicar:
+    name: Subir al hosting
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      FTP_SERVER: ${{ secrets.FTP_SERVER }}
+      FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+      FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+
+      - name: Comprobar que no hay errores de PHP
+        run: |
+          set -e
+          find . -name '*.php' -not -path './.git/*' -print0 | xargs -0 -n1 php -l
+
+      - name: Comprobar que el hosting está configurado
+        id: config
+        run: |
+          if [ -z "$FTP_SERVER" ] || [ -z "$FTP_USERNAME" ] || [ -z "$FTP_PASSWORD" ]; then
+            echo "listo=no" >> "$GITHUB_OUTPUT"
+            echo "::warning title=Web no publicada::Faltan los datos del hosting (secrets FTP_SERVER, FTP_USERNAME y FTP_PASSWORD). Sigue los pasos de LEEME.md, apartado «Publicación automática»."
+          else
+            echo "listo=si" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Subir los cambios por FTP
+        if: steps.config.outputs.listo == 'si'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          # Opcionales: si no se rellenan se usan estos valores por defecto.
+          protocol: ${{ secrets.FTP_PROTOCOL || 'ftps' }}
+          port: ${{ secrets.FTP_PORT || '21' }}
+          server-dir: ${{ secrets.FTP_SERVER_DIR || './' }}
+          # Solo sube lo que ha cambiado desde la última vez (guarda un registro
+          # en el servidor llamado .ftp-deploy-sync-state.json; no lo borres).
+          # Archivos que no deben llegar al servidor:
+          exclude: |
+            **/.git*
+            **/.git*/**
+            .github/**
+            **/*.md
+            **/.DS_Store
+            **/Thumbs.db
+            **/CV-original*
