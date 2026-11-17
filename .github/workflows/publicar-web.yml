@@ -32,6 +32,9 @@ jobs:
     steps:
       - name: Descargar el código
         uses: actions/checkout@v4
+        with:
+          # Historial completo, para saber qué ha cambiado desde la última publicación
+          fetch-depth: 0
 
       - name: Comprobar que no hay errores de PHP
         run: |
@@ -48,26 +51,16 @@ jobs:
             echo "listo=si" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Instalar lftp
+        if: steps.config.outputs.listo == 'si'
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+
+      # Sube solo lo que ha cambiado desde la última publicación (ver .github/scripts/publicar.sh).
+      # FTP_PROTOCOL y FTP_PORT son opcionales: por defecto, FTP normal por el puerto 21.
       - name: Subir los cambios por FTP
         if: steps.config.outputs.listo == 'si'
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          # Opcionales: si no se rellenan se usan estos valores por defecto.
-          # Va por FTP normal; para cifrar la conexión crea el secret FTP_PROTOCOL = ftps.
-          protocol: ${{ secrets.FTP_PROTOCOL || 'ftp' }}
-          port: ${{ secrets.FTP_PORT || '21' }}
-          server-dir: ${{ secrets.FTP_SERVER_DIR || './' }}
-          # Solo sube lo que ha cambiado desde la última vez (guarda un registro
-          # en el servidor llamado .ftp-deploy-sync-state.json; no lo borres).
-          # Archivos que no deben llegar al servidor:
-          exclude: |
-            **/.git*
-            **/.git*/**
-            .github/**
-            **/*.md
-            **/.DS_Store
-            **/Thumbs.db
-            **/CV-original*
+        env:
+          FTP_SERVER_DIR: ${{ secrets.FTP_SERVER_DIR }}
+          FTP_PROTOCOL: ${{ secrets.FTP_PROTOCOL }}
+          FTP_PORT: ${{ secrets.FTP_PORT }}
+        run: bash .github/scripts/publicar.sh
