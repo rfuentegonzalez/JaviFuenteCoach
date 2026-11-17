@@ -1,0 +1,5 @@
+.DS_Store
+Thumbs.db
+*.log
+# CV original con teléfono: no se sube nunca
+CV-original*
