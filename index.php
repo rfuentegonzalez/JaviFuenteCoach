@@ -243,7 +243,7 @@ $desc = "{$d['full_name']}, entrenador UEFA C de fútbol base. {$d['current']}";
 
         <ol class="licenses" aria-label="Licencias de entrenador UEFA">
             <?php
-            $lab = ['done' => 'Conseguida', 'next' => 'Siguiente paso', 'later' => ''];
+            $lab = ['done' => 'Conseguida', 'progress' => 'En curso', 'next' => 'Siguiente paso', 'later' => ''];
             foreach ($d['licenses'] as $l): ?>
             <li class="license is-<?= e($l['status']) ?>">
                 <span class="license__node" aria-hidden="true"></span>

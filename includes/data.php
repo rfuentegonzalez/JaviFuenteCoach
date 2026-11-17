@@ -37,7 +37,7 @@ return [
             'now'    => true,
             'roles'  => [
                 ['title' => 'Primer entrenador', 'club' => 'Fundación Rayo Vallecano', 'tags' => ['Benjamín I', 'Preferente']],
-                ['title' => 'Aprendiz de analista', 'club' => 'Rayo Vallecano B', 'tags' => ['3.ª RFEF', 'Análisis de vídeo']],
+                ['title' => 'Aprendiz de analista', 'club' => 'Rayo Vallecano B (3.ª RFEF)', 'tags' => ['Análisis de vídeo']],
             ],
         ],
         [
@@ -84,10 +84,10 @@ return [
         ['title' => 'Ganas de aprender', 'text' => 'Me dejo aconsejar y pregunto constantemente para mejorar.'],
     ],
 
-    // Camino de licencias UEFA: done = conseguida, next = siguiente paso, later = más adelante
+    // Camino de licencias UEFA: done = conseguida, progress = en curso, next = siguiente paso, later = más adelante
     'licenses' => [
         ['name' => 'C', 'status' => 'done', 'note' => 'Conseguida en mayo de 2026'],
-        ['name' => 'B', 'status' => 'next', 'note' => 'Se matricula esta temporada'],
+        ['name' => 'B', 'status' => 'progress', 'note' => 'Desde noviembre de 2026, en la RFFM con la Universidad Europea de Madrid'],
         ['name' => 'A', 'status' => 'later', 'note' => 'Más adelante'],
         ['name' => 'Pro', 'status' => 'later', 'note' => 'Más adelante'],
     ],
@@ -95,6 +95,6 @@ return [
     // Otra formación en curso
     'education' => [
         ['title' => 'Ciclo Formativo de Grado Medio TECO', 'where' => 'TAFAD Madrid, Torrejón de Ardoz', 'when' => '2.º curso', 'status' => 'progress'],
-        ['title' => 'Analista de fútbol', 'where' => 'Aprendiz en el Rayo Vallecano B y curso de analista', 'when' => 'Esta temporada', 'status' => 'progress'],
+        ['title' => 'Analista de fútbol', 'where' => 'Aprendiz en el Rayo Vallecano B (3.ª RFEF) y curso de analista', 'when' => 'Esta temporada', 'status' => 'progress'],
     ],
 ];

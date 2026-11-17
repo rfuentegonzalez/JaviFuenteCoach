@@ -345,6 +345,8 @@ ul, ol { padding: 0; list-style: none; }
 .license.is-done .license__status { background: var(--lima); color: var(--marino); }
 .license.is-next .license__node { border-color: var(--campo-claro); background: var(--marino); box-shadow: 0 0 0 6px rgba(127,163,255,.18); }
 .license.is-next .license__status { border: 1px solid var(--campo-claro); color: var(--campo-claro); }
+.license.is-progress .license__node { border-color: var(--campo); background: var(--campo); box-shadow: 0 0 0 6px rgba(47,107,255,.22); }
+.license.is-progress .license__status { background: var(--campo); color: #fff; }
 .license.is-later .license__name { color: rgba(255,255,255,.28); }
 .license.is-later .license__note { color: rgba(174,185,214,.6); }
 
