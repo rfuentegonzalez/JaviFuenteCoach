@@ -67,24 +67,25 @@ $desc = "{$d['full_name']}, entrenador UEFA C de fútbol base. {$d['current']}";
 <!-- PORTADA -->
 <section class="hero" aria-labelledby="hero-title">
     <svg class="hero__pitch" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-        <g fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="40" y="40" width="1120" height="720"/>
-            <line x1="600" y1="40" x2="600" y2="760"/>
-            <circle cx="600" cy="400" r="110"/>
-            <circle cx="600" cy="400" r="4" fill="currentColor"/>
-            <rect x="40" y="200" width="170" height="400"/>
-            <rect x="40" y="300" width="60" height="200"/>
-            <path d="M210 330 a90 90 0 0 1 0 140"/>
-            <rect x="990" y="200" width="170" height="400"/>
-            <rect x="1100" y="300" width="60" height="200"/>
-            <path d="M990 330 a90 90 0 0 0 0 140"/>
+        <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path class="chalk" style="--d:0s" pathLength="1" d="M40 40H1160V760H40Z"/>
+            <path class="chalk" style="--d:.25s" pathLength="1" d="M600 40V760"/>
+            <path class="chalk" style="--d:.4s" pathLength="1" d="M600 290a110 110 0 1 1 0 220a110 110 0 1 1 0-220"/>
+            <circle class="chalk-dot" cx="600" cy="400" r="4" fill="currentColor"/>
+            <path class="chalk" style="--d:.5s" pathLength="1" d="M40 200H210V600H40"/>
+            <path class="chalk" style="--d:.65s" pathLength="1" d="M40 300H100V500H40"/>
+            <path class="chalk" style="--d:.75s" pathLength="1" d="M210 330a90 90 0 0 1 0 140"/>
+            <path class="chalk" style="--d:.5s" pathLength="1" d="M1160 200H990V600H1160"/>
+            <path class="chalk" style="--d:.65s" pathLength="1" d="M1160 300H1100V500H1160"/>
+            <path class="chalk" style="--d:.75s" pathLength="1" d="M990 330a90 90 0 0 0 0 140"/>
         </g>
     </svg>
 
     <div class="hero__inner">
         <h1 id="hero-title" class="hero__name">
-            <span class="hero__line">Javier</span>
-            <span class="hero__line">Fuente<span class="hero__ball" aria-hidden="true"></span></span>
+            <span class="sr-only">Javier Fuente</span>
+            <span class="hero__line" aria-hidden="true"><?= hero_letters('Javier') ?></span>
+            <span class="hero__line" aria-hidden="true"><?= hero_letters('Fuente', 6) ?><span class="hero__ball"></span></span>
         </h1>
 
         <div class="hero__intro">

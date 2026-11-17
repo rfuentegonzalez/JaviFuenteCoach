@@ -149,9 +149,31 @@ ul, ol { padding: 0; list-style: none; }
     box-shadow: 0 0 0 18px rgba(255,255,255,.08);
 }
 
-/* Animación de entrada: el balón llega rodando y se queda como punto final */
+/* Lector de pantalla: el nombre se lee entero aunque visualmente vaya letra a letra */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+/* Parallax suave (lo mueve main.js con --mx, --my y --sy; sin JS o sin movimiento se queda quieto) */
+.hero__photo img { transform: translate3d(calc(var(--mx, 0) * 10px), calc(var(--my, 0) * 6px + var(--sy, 0) * .08px), 0); }
+.hero__photo::before { transform: translate3d(calc(var(--mx, 0) * -16px), calc(var(--my, 0) * -10px + var(--sy, 0) * .2px), 0); }
+
+/* Animación de entrada (menos de 2 s):
+   1) las líneas del campo se pintan como con tiza,
+   2) el nombre entra letra a letra,
+   3) el balón llega rodando y se queda como punto final */
 @media (prefers-reduced-motion: no-preference) {
-    .js .hero__ball { animation: roll-in 1.1s cubic-bezier(.2,.8,.25,1) .35s both; }
+    .js .hero__pitch .chalk { stroke-dasharray: 1; animation: chalk-draw 1s cubic-bezier(.45,.05,.35,1) var(--d) both; }
+    .js .hero__pitch .chalk-dot { animation: chalk-dot .3s ease-out .55s both; }
+    @keyframes chalk-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+    @keyframes chalk-dot { from { opacity: 0; transform: scale(0); } to { opacity: 1; transform: none; } }
+    .hero__pitch .chalk-dot { transform-box: fill-box; transform-origin: center; }
+
+    .js .hero__ch { display: inline-block; animation: letter-in .55s cubic-bezier(.2,.8,.25,1) calc(.1s + var(--i) * .045s) both; }
+    @keyframes letter-in {
+        from { opacity: 0; transform: translateY(.3em) rotate(6deg); }
+        to   { opacity: 1; transform: none; }
+    }
+
+    .js .hero__ball { animation: roll-in 1.1s cubic-bezier(.2,.8,.25,1) .6s both; }
     @keyframes roll-in {
         0%   { transform: translateX(60vw) rotate(720deg); opacity: 0; }
         15%  { opacity: 1; }

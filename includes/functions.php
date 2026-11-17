@@ -54,3 +54,13 @@ function inline_svg(string $file): string
     $path = __DIR__ . '/../assets/logo/' . basename($file);
     return is_file($path) ? (string) file_get_contents($path) : '';
 }
+
+/** Nombre de la portada letra a letra (para la animación de entrada). Cada letra lleva su orden en --i. */
+function hero_letters(string $word, int $start = 0): string
+{
+    $out = '';
+    foreach (mb_str_split($word) as $n => $ch) {
+        $out .= sprintf('<span class="hero__ch" style="--i:%d">%s</span>', $start + $n, e($ch));
+    }
+    return $out;
+}

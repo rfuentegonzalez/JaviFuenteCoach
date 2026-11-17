@@ -82,3 +82,69 @@
     }, { threshold: 0.2 });
     els.forEach((el) => io.observe(el));
 })();
+
+// Portada: el nombre entra letra a letra. Al separar las letras para animarlas se pierde el
+// ajuste entre parejas como «JA» o «AV»; aquí se mide y se compensa para que el nombre quede igual.
+(() => {
+    const name = document.querySelector('.hero__name');
+    if (!name || !matchMedia('(prefers-reduced-motion: no-preference)').matches) return;
+    const lines = [...name.querySelectorAll('.hero__line')].map((l) => [...l.querySelectorAll('.hero__ch')]);
+
+    const fix = () => {
+        const fs = parseFloat(getComputedStyle(name).fontSize);
+        lines.forEach((chars) => {
+            chars.forEach((c) => { c.style.marginLeft = ''; c.style.display = 'inline'; });
+            const kerned = chars.map((c) => c.offsetLeft);
+            chars.forEach((c) => { c.style.display = ''; });
+            const split = chars.map((c) => c.offsetLeft);
+            chars.forEach((c, i) => {
+                if (!i) return;
+                const gap = (kerned[i] - kerned[i - 1]) - (split[i] - split[i - 1]);
+                if (Math.abs(gap) > 0.2) c.style.marginLeft = `${(gap / fs).toFixed(4)}em`;
+            });
+        });
+    };
+    fix();
+    document.fonts?.ready.then(fix);
+})();
+
+// Portada: el retrato y su círculo se mueven un poco con el ratón y el scroll (sensación de profundidad).
+// Solo en pantallas grandes; en móvil y con «reducir movimiento» se queda quieto.
+(() => {
+    const photo = document.querySelector('.hero__photo');
+    const hero = document.querySelector('.hero');
+    const mq = matchMedia('(min-width: 901px) and (prefers-reduced-motion: no-preference)');
+    if (!photo || !hero) return;
+    const fine = matchMedia('(hover: hover) and (pointer: fine)');
+
+    const target = { mx: 0, my: 0, sy: 0 };
+    const now = { mx: 0, my: 0, sy: 0 };
+    let raf = 0;
+
+    const tick = () => {
+        let moving = false;
+        for (const k in now) {
+            const d = target[k] - now[k];
+            now[k] = Math.abs(d) < 0.001 ? target[k] : now[k] + d * 0.12;
+            if (now[k] !== target[k]) moving = true;
+            photo.style.setProperty(`--${k}`, now[k].toFixed(3));
+        }
+        raf = moving ? requestAnimationFrame(tick) : 0;
+    };
+    const go = () => { if (!raf) raf = requestAnimationFrame(tick); };
+
+    hero.addEventListener('pointermove', (e) => {
+        if (!mq.matches || !fine.matches || e.pointerType !== 'mouse') return;
+        const r = hero.getBoundingClientRect();
+        target.mx = ((e.clientX - r.left) / r.width - 0.5) * 2;
+        target.my = ((e.clientY - r.top) / r.height - 0.5) * 2;
+        go();
+    });
+    hero.addEventListener('pointerleave', () => { target.mx = target.my = 0; go(); });
+    addEventListener('scroll', () => {
+        if (!mq.matches) return;
+        target.sy = Math.min(scrollY, hero.offsetHeight);
+        go();
+    }, { passive: true });
+    mq.addEventListener?.('change', () => { if (!mq.matches) { target.mx = target.my = target.sy = 0; go(); } });
+})();
