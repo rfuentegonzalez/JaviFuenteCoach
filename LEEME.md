@@ -17,7 +17,7 @@ Landing page en PHP (sin base de datos ni librerías externas). Funciona en cual
 
 ## Publicación automática
 
-Cada vez que se hace merge de un cambio en la rama `main`, GitHub sube sola la web al hosting por FTP normal (sin cifrar). Si el hosting admite FTPS, conviene activarlo con el secret `FTP_PROTOCOL` (ver la tabla del paso 2): así la contraseña viaja cifrada. Solo envía los archivos que han cambiado, así que tarda poco. Antes de subir nada comprueba que los archivos PHP no tienen errores; si los tiene, no publica y la web sigue como estaba.
+Cada vez que se hace merge de un cambio en la rama `main`, GitHub sube sola la web al hosting por FTP normal, que es lo que permite el plan Junior de cdmon. Si algún día el plan admite SFTP (conexión cifrada), conviene activarlo con el secret `FTP_PROTOCOL` (ver la tabla del paso 2). Solo envía los archivos que han cambiado, así que tarda poco. Antes de subir nada comprueba que los archivos PHP no tienen errores; si los tiene, no publica y la web sigue como estaba.
 
 No se suben al servidor: este `LEEME.md` y cualquier otro `.md`, la carpeta `.github`, los archivos de Git (`.gitignore`…) ni un posible `CV-original`.
 
@@ -30,7 +30,7 @@ Al contratar el hosting te llegará un correo de bienvenida, o los verás en su 
 - **Servidor FTP**: algo como `ftp.javierfuente.es` o `ftp.nombredelhosting.com`. Sin `ftp://` delante.
 - **Usuario FTP**.
 - **Contraseña FTP**. Si no la sabes, crea una cuenta FTP nueva desde el panel y apunta la contraseña.
-- **Carpeta de la web**: la carpeta pública donde va la web, normalmente `public_html/` o `www/`. Si al entrar por FTP ya estás dentro de esa carpeta, no hace falta este dato.
+- **Carpeta de la web**: la carpeta pública donde va la web. **En cdmon es `web/`.** En otros hostings suele ser `public_html/` o `www/`.
 
 Si dudas, escribe al soporte del hosting: «¿Qué servidor, usuario y carpeta tengo que usar para subir la web por FTP?».
 
@@ -50,9 +50,9 @@ Los secrets son datos privados que GitHub guarda cifrados: nadie los puede ver, 
 | `FTP_SERVER` | El servidor FTP, p. ej. `ftp.javierfuente.es` | Sí |
 | `FTP_USERNAME` | El usuario FTP | Sí |
 | `FTP_PASSWORD` | La contraseña FTP | Sí |
-| `FTP_SERVER_DIR` | La carpeta de la web **terminada en barra**, p. ej. `public_html/` | Solo si al entrar por FTP no estás ya dentro de la carpeta pública |
-| `FTP_PROTOCOL` | `ftp` (por defecto), o `ftps` / `ftps-legacy` si el hosting admite conexión cifrada | No |
-| `FTP_PORT` | El puerto, si el hosting indica uno distinto de 21 | No |
+| `FTP_SERVER_DIR` | La carpeta de la web **terminada en barra**. En cdmon: `web/` | Sí en cdmon |
+| `FTP_PROTOCOL` | `ftp` (por defecto) o `sftp` si el plan del hosting lo admite | No |
+| `FTP_PORT` | Solo si el hosting indica otro puerto (por defecto 21 con `ftp` y 22 con `sftp`) | No |
 
 Si te equivocas en un valor, vuelve a esa pantalla, pulsa el lápiz junto al secret y pégalo de nuevo (GitHub no deja ver el valor guardado, solo reemplazarlo).
 
@@ -71,13 +71,15 @@ Si sale una cruz roja, pulsa sobre ella y luego en **Subir al hosting** para ver
 
 - **Error de inicio de sesión (`530`, `Login incorrect`)**: revisa `FTP_USERNAME` y `FTP_PASSWORD`. Algunos hostings piden el usuario completo, tipo `usuario@javierfuente.es`.
 - **Error de conexión (`ECONNREFUSED`, `timeout`)**: revisa `FTP_SERVER` y pregunta al hosting si el FTP usa un puerto distinto de 21; si es así, créalo en `FTP_PORT`.
-- **El hosting solo admite conexión cifrada (`530 TLS required`, `SSL/TLS required`)**: crea `FTP_PROTOCOL` con el valor `ftps`. Si aun así falla, prueba `ftps-legacy` con `FTP_PORT` = `990`.
+- **`cd: Access failed` o `No such file or directory`**: la carpeta de `FTP_SERVER_DIR` no existe. En cdmon debe ser `web/`.
+- **De repente deja de conectar en cdmon**: cdmon desactiva el FTP solo si pasan 12 días sin usarlo. Vuelve a activarlo en el panel de control > tu hosting > icono **FTP** > botón de activar, y relanza la publicación (Actions > la ejecución fallida > **Re-run jobs**).
 - **La web sale vacía o dentro de otra carpeta**: revisa `FTP_SERVER_DIR` (debe terminar en `/`).
 - **Errores de PHP**: el paso «Comprobar que no hay errores de PHP» indica el archivo y la línea. Corrígelo y vuelve a hacer merge.
 
 ### Cosas a tener en cuenta
 
-- En el servidor aparecerá un archivo `.ftp-deploy-sync-state.json`. Es el registro de lo que ya se ha subido: **no lo borres** (si se borra, la siguiente vez se vuelve a subir todo, sin más problema). El `.htaccess` impide que se vea desde fuera.
+- En el servidor aparecerá un archivo `.deploy-commit`. Guarda qué versión está publicada para subir solo los cambios la próxima vez. Si se borra, no pasa nada: la siguiente vez se sube la web entera. El `.htaccess` impide que se vea desde fuera.
+- **cdmon apaga el FTP tras 12 días sin usarse.** Si pasan más de 12 días sin publicar, la siguiente subida fallará hasta que lo reactives (ver «Si falla»).
 - Si cambias o borras un archivo **directamente en el hosting**, la publicación automática no se entera. Haz siempre los cambios en el repositorio.
 - Los archivos que se borran del repositorio también se borran del servidor en la siguiente publicación.
 
